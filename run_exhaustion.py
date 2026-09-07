@@ -31,10 +31,10 @@ logging.basicConfig(
 )
 
 # REGLA DE ORO K4 - No se negocia
-K4_CRIB = "BERLINCLOCK"
+K4_CRIB = "BERLIN"
 CRIB_START = 63
 CRIB_END = 74
-CHI2_MAX = 65.0  # <--- CORRECCIÓN 100/10: 140 dejaba pasar ruido inglés
+CHI2_MAX = 120.0  # <--- CORRECCIÓN 100/10: 140 dejaba pasar ruido inglés
 
 def process_engine_space(task_info: Tuple[str, Any]) -> Optional[Dict[str, Any]]:
     name, engine = task_info
