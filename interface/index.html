@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="folio" content="5204160405358537"><meta name="sha" content="a4ff808e">
+<meta name="trace" content="KRONOS-TRACE-PVA-5204160405358537-KRONOS-MT01JAAF">
+<title>KRONOS MD-35 ULTRA</title>
+<style>body,html{margin:0;padding:0;overflow:hidden;background:radial-gradient(ellipse at center,#001111,#000 70%);font-family:monospace;color:#0fc}canvas{position:absolute;top:0;left:0;width:100%;height:100%}.hud{position:absolute;z-index:10;background:linear-gradient(180deg,rgba(0,20,15,.95),rgba(0,10,5,.9));padding:14px;border:1px solid #0fc;border-radius:6px;font-size:11px;line-height:1.5;box-shadow:0 0 25px rgba(0,255,204,.3)}#hud-izq{top:20px;left:20px;width:300px}#hud-der{top:20px;right:20px;width:300px;max-height:400px;overflow-y:auto}.btn{background:linear-gradient(90deg,#0fc,#0af);color:#000;border:none;padding:8px;width:100%;font-weight:bold;cursor:pointer;margin-top:8px;border-radius:3px}.btn:hover{background:#fff}.log{border-left:2px solid #0fc;padding:6px 8px;margin:4px 0;color:#8fd;font-size:10px;background:rgba(0,255,204,.05)}.resaltado{color:#fff;font-weight:bold;text-shadow:0 0 5px #0fc}.titulo{color:#0fc;text-shadow:0 0 8px #0fc;letter-spacing:2px}</style>
+<script src="https://cloudflare.com"></script>
+</head>
+<body>
+<div class="hud" id="hud-izq">
+<div class="titulo">◢ KRONOS MD-35 ULTRA ◣</div>
+<div>[NUCLEO]: <span class="resaltado">MT01JAAF a4ff808e</span></div>
+<div>[MODO]: <span id="txt-dimension" class="resaltado">1D FILAMENTO CUANTICO</span></div>
+<div>[FPS]: <span id="fps">60</span> | [AUDIO]: <span id="txt-audio">OFF</span></div>
+<div style="margin:8px 0;border-top:1px solid #0fc"></div>
+ESPACIO:Cristal | 1/2/3:Dimension<br>Q:Cuantico ON/OFF | WASD:Volar | P:Foto PNG<br>
+<button class="btn" id="btn-micro">▶ ACTIVAR AUDIO CUANTICO</button>
+<button class="btn" id="btn-synth" style="background:linear-gradient(90deg,#f0f,#0fc)">♪ SINTETIZADOR AMBIENTAL</button>
+<div style="font-size:7px;margin-top:8px;opacity:.7">TRACE: KRONOS-TRACE-PVA-5204160405358537-MT01JAAF<br>SC:2607146379465</div>
+</div>
+<div class="hud" id="hud-der"><div class="titulo">LEGADO 2099 - CAPTURAS</div><div id="historial"></div></div>
+<canvas id="canvas-kronos"></canvas>
+<script>
+let modoDimension=1,modoCuantico=false,audioContext,analyser,dataArray,nivelAudio=0,synthActivo=false,osciladores=[];
+const SELLO="KRONOS-TRACE-PVA-5204160405358537-KRONOS-MT01JAAF",SHA="a4ff808e";
+let lastTime=performance.now(),frameCount=0;
+document.getElementById("btn-micro").addEventListener("click",async()=>{
+try{let s=await navigator.mediaDevices.getUserMedia({audio:true});audioContext=new(window.AudioContext||window.webkitAudioContext)();let src=audioContext.createMediaStreamSource(s);analyser=audioContext.createAnalyser();analyser.fftSize=64;src.connect(analyser);dataArray=new Uint8Array(analyser.frequencyBinCount);document.getElementById("btn-micro").innerText="● AUDIO ENLAZADO";document.getElementById("txt-audio").innerText="ENLAZADO "+SHA;document.getElementById("btn-micro").style.background="#fff";}catch(e){alert("Mic denegado")}});
+document.getElementById("btn-synth").addEventListener("click",()=>{
+if(!audioContext)audioContext=new(window.AudioContext||window.webkitAudioContext)();
+synthActivo=!synthActivo;
+if(synthActivo){document.getElementById("btn-synth").innerText="■ DETENER SINTETIZADOR";for(let i=0;i<3;i++){let osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type="sine";osc.frequency.value=55*(i+1);gain.gain.value=0.03;osc.connect(gain);gain.connect(audioContext.destination);osc.start();osciladores.push({osc,gain,base:55*(i+1)});}}else{document.getElementById("btn-synth").innerText="♪ SINTETIZADOR AMBIENTAL";osciladores.forEach(o=>o.osc.stop());osciladores=[];}});
+let scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000),renderer=new THREE.WebGLRenderer({canvas:document.getElementById("canvas-kronos"),antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(innerWidth,innerHeight);camera.position.z=5;
+let mouseX=0,mouseY=0;addEventListener("mousemove",e=>{mouseX=(e.clientX/innerWidth)*2-1;mouseY=-(e.clientY/innerHeight)*2+1;});
+let COUNT=1200,geometry=new THREE.BufferGeometry(),positions=new Float32Array(COUNT*3),boids=[];
+for(let i=0;i<COUNT;i++){positions[i*3]=(Math.random()-0.5)*8;positions[i*3+1]=0;positions[i*3+2]=0;boids.push({pos:new THREE.Vector3(positions[i*3],0,0),estado0:new THREE.Vector3((Math.random()-0.5)*8,(Math.random()-0.5)*5,(Math.random()-0.5)*5),estado1:new THREE.Vector3((Math.random()-0.5)*2,(Math.random()-0.5)*2,(Math.random()-0.5)*2),vel:new THREE.Vector3((Math.random()-0.5)*0.04,(Math.random()-0.5)*0.04,(Math.random()-0.5)*0.04),acc:new THREE.Vector3(),fase:Math.random()*Math.PI*2});}
+geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
+let material=new THREE.PointsMaterial({color:0x00ffcc,size:0.05,transparent:true,opacity:0.9,blending:THREE.AdditiveBlending});
+let points=new THREE.Points(geometry,material);scene.add(points);
+let lineGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-10,0,0),new THREE.Vector3(10,0,0)]),lineMat=new THREE.LineBasicMaterial({color:0x00ffcc,transparent:true,opacity:0.6}),refLine=new THREE.Line(lineGeo,lineMat);scene.add(refLine);
+let meshGeo=new THREE.PlaneGeometry(14,14,40,40),meshMat=new THREE.MeshBasicMaterial({color:0x00ffcc,wireframe:true,transparent:true,opacity:0.08}),terrain=new THREE.Mesh(meshGeo,meshMat);terrain.rotation.x=-Math.PI/2;terrain.position.y=-2.5;scene.add(terrain);
+let cristales=[],cristalGeo=new THREE.OctahedronGeometry(0.22,0);
+function crearCristal(){let idx=Math.floor(Math.random()*COUNT);let p=new THREE.Vector3(positions[idx*3],positions[idx*3+1],positions[idx*3+2]);let mat=new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true,transparent:true,opacity:0.9});let mesh=new THREE.Mesh(cristalGeo,mat);mesh.position.copy(p);mesh.userData={baseY:p.y};scene.add(mesh);cristales.push(mesh);if(audioContext&&synthActivo){let osc=audioContext.createOscillator(),g=audioContext.createGain();osc.frequency.value=220+Math.random()*440;g.gain.value=0.15;g.gain.exponentialRampToValueAtTime(0.001,audioContext.currentTime+1.2);osc.connect(g);g.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+1.2);}guardar("CRISTAL #"+cristales.length+" D:"+modoDimension+" X:"+p.x.toFixed(2)+" A:"+nivelAudio.toFixed(0)+"Hz ["+SHA+"]");}
+function guardar(info){let r=JSON.parse(localStorage.getItem("kronos_legado")||"[]");r.unshift("["+new Date().toLocaleTimeString()+"] "+info);if(r.length>10)r.pop();localStorage.setItem("kronos_legado",JSON.stringify(r));
+renderHist();
+
+// ENLACE CUANTICO: Conectar el Canvas 3D de KRONOS con el Servidor de Fuerza Bruta run_exhaustion.py
+// Conector Inteligente Adaptativo para Entornos Codespaces + GitHub Pages
+const isCodespace = window.location.hostname.includes("github.dev") || window.location.hostname.includes("preview.app.github.dev");
+const wsUrl = isCodespace 
+    ? "wss://" + window.location.hostname.replace("-8080", "-8765") 
+    : "ws://" + (window.location.hostname || "localhost") + ":8765";
+
+const ws = new WebSocket(wsUrl);
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    // Cada vez que el backend vectorizado encuentra una pista alineada, materializa un Cristal en el espacio 3D
+    crearCristal();
+    guardar(data.msg);
+};
+ws.onopen = () => { guardar("CONEXIÓN CON EL NÚCLEO LFSR ESTABLECIDA [" + SHA + "]"); };
+ws.onerror = () => { guardar("ERROR DE ENLACE DE RED CON EL SERVIDOR MATRIX"); };
+}
+function renderHist(){let r=JSON.parse(localStorage.getItem("kronos_legado")||"[]");document.getElementById("historial").innerHTML=r.map(x=>"<div class=log>"+x+"</div>").join("");}
+
+renderHist();
+
+// ENLACE CUANTICO: Conectar el Canvas 3D de KRONOS con el Servidor de Fuerza Bruta run_exhaustion.py
+// Conector Inteligente Adaptativo para Entornos Codespaces + GitHub Pages
+const isCodespace = window.location.hostname.includes("github.dev") || window.location.hostname.includes("preview.app.github.dev");
+const wsUrl = isCodespace 
+    ? "wss://" + window.location.hostname.replace("-8080", "-8765") 
+    : "ws://" + (window.location.hostname || "localhost") + ":8765";
+
+const ws = new WebSocket(wsUrl);
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    // Cada vez que el backend vectorizado encuentra una pista alineada, materializa un Cristal en el espacio 3D
+    crearCristal();
+    guardar(data.msg);
+};
+ws.onopen = () => { guardar("CONEXIÓN CON EL NÚCLEO LFSR ESTABLECIDA [" + SHA + "]"); };
+ws.onerror = () => { guardar("ERROR DE ENLACE DE RED CON EL SERVIDOR MATRIX"); };
+
+function capturarFoto(){renderer.render(scene,camera);let a=document.createElement("a");a.download="KRONOS_MD35_ULTRA_"+Date.now()+".png";a.href=renderer.domElement.toDataURL("image/png");a.click();}
+let teclas={};
+addEventListener("keydown",e=>{
+teclas[e.key.toLowerCase()]=true;
+if(e.key==="1"){modoDimension=1;document.getElementById("txt-dimension").innerText="1D FILAMENTO CUANTICO";material.color.setHex(0x00ffcc);}
+else if(e.key==="2"){modoDimension=2;document.getElementById("txt-dimension").innerText="2D BIG BANG COLECTIVO";material.color.setHex(0xffffff);}
+else if(e.key==="3"){modoDimension=3;document.getElementById("txt-dimension").innerText="3D PAISAJE ABSOLUTO";material.color.setHex(0x00aaff);}
+else if(e.key.toLowerCase()==="q"){modoCuantico=!modoCuantico;document.getElementById("txt-dimension").innerText=modoCuantico?"CUANTICO Ψ ON":"1D FILAMENTO";material.color.setHex(modoCuantico?0xff00ff:0x00ffcc);}
+else if(e.key===" "){crearCristal();}
+else if(e.key.toLowerCase()==="p"){capturarFoto();}
+});
+addEventListener("keyup",e=>{teclas[e.key.toLowerCase()]=false;});
+function animar(){
+requestAnimationFrame(animar);
+let now=performance.now();
+frameCount++;
+if(now-lastTime>=1000){document.getElementById("fps").innerText=Math.round((frameCount*1000)/(now-lastTime));frameCount=0;lastTime=now;}
+nivelAudio=0;
+if(analyser&&dataArray){analyser.getByteFrequencyData(dataArray);let sum=0;for(let i=0;i<dataArray.length;i++)sum+=dataArray[i];nivelAudio=sum/dataArray.length;osciladores.forEach((o,idx)=>{o.osc.frequency.setValueAtTime(o.base+(nivelAudio*(idx+1)*0.1),audioContext.currentTime);});}
+let posAttr=geometry.getAttribute("position");
+for(let i=0;i<COUNT;i++){
+let boid=boids[i];boid.fase+=0.02+(nivelAudio*0.001);
+if(modoCuantico){boid.pos.lerp(boid.estado1,0.05);boid.pos.y+=Math.sin(boid.fase)*0.02;}
+else if(modoDimension===1){boid.pos.set((i/COUNT-0.5)*8,0,0);}
+else if(modoDimension===2){let r=(i/COUNT)*3.5+0.5;boid.pos.set(Math.cos(boid.fase+i)*r,Math.sin(boid.fase+i)*r*0.4,0);}
+else if(modoDimension===3){boid.pos.lerp(boid.estado0,0.03);boid.pos.addScaledVector(boid.vel,0.5);if(boid.pos.length()>6)boid.pos.setLength(6);}
+positions[i*3]=boid.pos.x;positions[i*3+1]=boid.pos.y;positions[i*3+2]=boid.pos.z;
+}
+posAttr.needsUpdate=true;
+let speed=0.08;
+if(teclas["w"])camera.position.z-=speed;if(teclas["s"])camera.position.z+=speed;
+if(teclas["a"])camera.position.x-=speed;if(teclas["d"])camera.position.x+=speed;
+camera.position.x+=(mouseX*4-camera.position.x)*0.05;camera.position.y+=(mouseY*4-camera.position.y)*0.05;
+camera.lookAt(scene.position);
+cristales.forEach((mesh,idx)=>{mesh.rotation.y+=0.03;mesh.rotation.x+=0.01;mesh.position.y=mesh.userData.baseY+Math.sin(performance.now()*0.003+idx)*0.15+(nivelAudio*0.005);});
+renderer.render(scene,camera);
+}
+
+window.addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});animar();

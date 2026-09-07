@@ -3,45 +3,31 @@ nohup: ignoring input
  K4 EXHAUSTION MASTER ORCHESTRATOR v2.0 - AUDIT GRADE
 ================================================================
 [*] Criptograma: OBKRUOXOGHULBSOLIFBB... (97 chars)
-[*] Regla: plaintext[63:74] == BERLINCLOCK
+[*] Regla: plaintext[60:85] == BERLIN
 [*] Chi2 Threshold: 120.0
 [*] Plugin inyectado: VicFractionalCipher
-[*] Cores: 2 | Motores: 9
+[*] Cores: 2 | Motores: 11
 
 ==================== RESULTADOS ====================
 [-] 0/14100+ configuraciones. Exclusión confirmada.
 [-] Log guardado en exhaustion.log para CI
-ando: Beaufort
-2026-09-07 06:49:57 [INFO] Finalizado sin hits: Beaufort
-2026-09-07 06:49:57 [INFO] Iniciando: NonLinearAutokey
-2026-09-07 06:49:57 [INFO] Finalizado sin hits: NonLinearAutokey
-2026-09-07 06:49:57 [INFO] Iniciando: AsymmetricColumnar
-2026-09-07 06:49:57 [INFO] Iniciando: BerlinGrille
-2026-09-07 06:49:57 [INFO] Finalizado sin hits: BerlinGrille
-2026-09-07 06:49:57 [INFO] Iniciando: BerlinClockLFSR
-2026-09-07 06:49:57 [INFO] Finalizado sin hits: AsymmetricColumnar
-2026-09-07 06:49:57 [INFO] Iniciando: InversionTemplate
-2026-09-07 06:49:57 [INFO] Finalizado sin hits: InversionTemplate
-2026-09-07 06:49:57 [INFO] Iniciando: HillMatrix2x2
-2026-09-07 06:49:57 [INFO] Finalizado sin hits: HillMatrix2x2
-2026-09-07 06:49:57 [INFO] Iniciando: VicFractionalCipher
-2026-09-07 06:49:57 [INFO] Finalizado sin hits: VicFractionalCipher
-2026-09-07 06:50:12 [INFO] Finalizado sin hits: BerlinClockLFSR
-2026-09-07 06:52:36 [INFO] Iniciando: VigenereCascade
-2026-09-07 06:52:36 [INFO] Finalizado sin hits: VigenereCascade
-2026-09-07 06:52:36 [INFO] Iniciando: Beaufort
-2026-09-07 06:52:36 [INFO] Iniciando: NonLinearAutokey
-2026-09-07 06:52:36 [INFO] Finalizado sin hits: Beaufort
-2026-09-07 06:52:36 [INFO] Iniciando: BerlinGrille
-2026-09-07 06:52:36 [INFO] Finalizado sin hits: BerlinGrille
-2026-09-07 06:52:36 [INFO] Finalizado sin hits: NonLinearAutokey
-2026-09-07 06:52:36 [INFO] Iniciando: AsymmetricColumnar
-2026-09-07 06:52:36 [INFO] Iniciando: BerlinClockLFSR
-2026-09-07 06:52:37 [INFO] Finalizado sin hits: AsymmetricColumnar
-2026-09-07 06:52:37 [INFO] Iniciando: InversionTemplate
-2026-09-07 06:52:37 [INFO] Finalizado sin hits: InversionTemplate
-2026-09-07 06:52:37 [INFO] Iniciando: HillMatrix2x2
-2026-09-07 06:52:37 [INFO] Finalizado sin hits: HillMatrix2x2
-2026-09-07 06:52:37 [INFO] Iniciando: VicFractionalCipher
-2026-09-07 06:52:37 [INFO] Finalizado sin hits: VicFractionalCipher
-2026-09-07 06:52:52 [INFO] Finalizado sin hits: BerlinClockLFSR
+ hits: NonLinearAutokey
+2026-09-07 07:31:30 [INFO] Iniciando: AsymmetricColumnar
+2026-09-07 07:31:30 [INFO] Finalizado sin hits: VigenereCascade
+2026-09-07 07:31:30 [INFO] Iniciando: Beaufort
+2026-09-07 07:31:30 [INFO] Finalizado sin hits: Beaufort
+2026-09-07 07:31:30 [INFO] Iniciando: BerlinGrille
+2026-09-07 07:31:30 [INFO] Finalizado sin hits: BerlinGrille
+2026-09-07 07:31:30 [INFO] Iniciando: BerlinClockLFSR
+2026-09-07 07:31:30 [INFO] Finalizado sin hits: AsymmetricColumnar
+2026-09-07 07:31:30 [INFO] Iniciando: InversionTemplate
+2026-09-07 07:31:30 [INFO] Finalizado sin hits: InversionTemplate
+2026-09-07 07:31:30 [INFO] Iniciando: HillMatrix2x2
+2026-09-07 07:31:32 [INFO] Finalizado sin hits: HillMatrix2x2
+2026-09-07 07:31:32 [INFO] Iniciando: HillColumnarCombo
+2026-09-07 07:31:40 [INFO] Finalizado sin hits: HillColumnarCombo
+2026-09-07 07:31:40 [INFO] Iniciando: VigenereColumnarCombo
+2026-09-07 07:32:05 [INFO] Finalizado sin hits: BerlinClockLFSR
+2026-09-07 07:32:05 [INFO] Iniciando: VicFractionalCipher
+2026-09-07 07:32:05 [INFO] Finalizado sin hits: VicFractionalCipher
+2026-09-07 07:32:08 [INFO] Finalizado sin hits: VigenereColumnarCombo

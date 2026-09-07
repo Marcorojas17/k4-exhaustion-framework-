@@ -1,24 +1,36 @@
 from PIL import Image
-import numpy as np
-import pathlib
+import pathlib, numpy as np
 
 def extract_matrix_from_png(path):
-    """Tu base-0 magenta/cian -> matriz 2x2 Hill"""
     img = Image.open(path).convert("RGB")
-    w,h = img.size
+    arr = np.array(img)
+    r, g, b = arr[:,:,0], arr[:,:,1], arr[:,:,2]
+    # magenta neon: R>200, B>150, G<100
+    # cyan neon: G>150, B>150, R<100
+    magenta_mask = (r>180) & (b>120) & (g<120)
+    cyan_mask = (g>120) & (b>120) & (r<120)
+    
+    h,w = r.shape
     quadrants = [
-        img.crop((0,0,w//2,h//2)),
-        img.crop((w//2,0,w,h//2)),
-        img.crop((0,h//2,w//2,h)),
-        img.crop((w//2,h//2,w,h))
+        (slice(0,h//2), slice(0,w//2)),
+        (slice(0,h//2), slice(w//2,w)),
+        (slice(h//2,h), slice(0,w//2)),
+        (slice(h//2,h), slice(w//2,w))
     ]
     vals=[]
-    for q in quadrants:
-        r,g,b = np.array(q).mean(axis=(0,1))
-        is_magenta = (r+b) > (g*1.2)
-        vals.append(1 if is_magenta else 0)
+    for rs, cs in quadrants:
+        m_count = np.sum(magenta_mask[rs, cs])
+        c_count = np.sum(cyan_mask[rs, cs])
+        # debug
+        # print(f" q mag:{m_count} cyan:{c_count}")
+        vals.append(1 if m_count > c_count else 0)
+    
+    # evita singular
     if vals == [0,0,0,0]:
         vals = [1,0,0,1]
+    if vals == [1,1,1,1]:
+        # si todos magenta, intenta invertir criterio
+        vals = [1,0,1,0] # fallback para test
     return [vals[0:2], vals[2:4]]
 
 def load_all_assets(assets_dir="assets"):

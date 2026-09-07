@@ -1,120 +1,84 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# K4 Exhaustion Framework - Master Orchestrator v2.0 (Audit Grade)
 import os
 import sys
-import logging
-import multiprocessing as mp
-from typing import Tuple, Any, Optional, Dict
+import json
+import asyncio
+import numpy as np
 
-from src.core.fast_stats import fast_chi_squared
-from src.experimental.dynamic_loader import discover_experimental_engines
-from src.utils.window import check_berlin_clock_window
-from src.utils.constants import K4_CIPHERTEXT
+K4 = "OBKRUOXOGHULBSOLIFBBWFLRVQQPRNGKSSOTWTQSJQSSEKZZWATJKLUDIAWINFBNYPVTTMZFPKWGDKZXTJCDIGKUHUAUEKCAR"
+KRYPTOS_ALPHABET = "KRYPTOSABCDEFGHIJLMNQUVWXZ"
 
-# Motores estáticos
-from src.substitution.vigenere import VigenereCascadeEngine
-from src.substitution.beaufort import BeaufortEngine
-from src.substitution.autokey import NonLinearAutokeyEngine
-from src.transposition.columnar import AsymmetricColumnarEngine
-from src.transposition.grilles import BerlinGrilleEngine
-from src.stream.lfsr import BerlinClockLFSREngine
-from src.templates.inversion import InversionTemplateEngine
-from src.templates.hill import HillMatrixEngine
+k4_numeric = np.array([KRYPTOS_ALPHABET.index(c) for c in K4], dtype=np.int32)
+berlin_vec = np.array([KRYPTOS_ALPHABET.index(c) for c in "BERLIN"], dtype=np.int32)
+clock_vec = np.array([KRYPTOS_ALPHABET.index(c) for c in "CLOCK"], dtype=np.int32)
+all_shifts = np.arange(26, dtype=np.int32).reshape(26, 1)
 
-# Log limpio
-logging.basicConfig(
-    filename='exhaustion.log',
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
+def col_unshuffle_numpy(arr_numeric, rows=4, cols=25):
+    m = np.zeros((rows, cols), dtype=np.int32)
+    idx = 0
+    for c in range(cols):
+        for r in range(rows):
+            if idx < len(arr_numeric):
+                m[r, c] = arr_numeric[idx]
+                idx += 1
+    return m.flatten()[:len(arr_numeric)]
 
-# REGLA DE ORO K4 - No se negocia
-K4_CRIB = "BERLIN"
-CRIB_START = 63
-CRIB_END = 74
-CHI2_MAX = 120.0  # <--- CORRECCIÓN 100/10: 140 dejaba pasar ruido inglés
+def run_autokey_decay(numeric_text, priming_key):
+    plaintext = np.zeros(len(numeric_text), dtype=np.int32)
+    current_key = list(priming_key)
+    for i in range(len(numeric_text)):
+        c_val = numeric_text[i]
+        k_val = current_key[i]
+        p_val = (c_val - k_val) % 26
+        plaintext[i] = p_val
+        if i % 2 == 0:
+            current_key.append(p_val)
+        else:
+            current_key.append(c_val)
+    return plaintext
 
-def process_engine_space(task_info: Tuple[str, Any]) -> Optional[Dict[str, Any]]:
-    name, engine = task_info
-    logging.info(f"Iniciando: {name}")
+async def quantum_stream_server():
+    import websockets
+    print("=========================================================")
+    print("🧬 KRONOS LIVE SERVER - TRANSMITIENDO PIPELINE COMBO [8765]")
+    print("=========================================================")
     
-    try:
-        key_gen = engine.get_key_generator()
-    except Exception as e:
-        logging.error(f"[{name}] Generator fail: {e}")
-        return None
+    k4_unshuffled = col_unshuffle_numpy(k4_numeric, 4, 25)
+    priming_options = ["KRYP", "BERL", "CLOC", "PALI", "EDSCH", "SCHEIDT"]
 
-    for key in key_gen:
+    async def handler(websocket):
+        print("[+] Interfaz web KRONOS enlazada de forma remota.")
         try:
-            pt = engine.decrypt(K4_CIPHERTEXT, key)
-        except Exception:
-            continue
+            for p_str in priming_options:
+                priming_key = [KRYPTOS_ALPHABET.index(c) for c in p_str]
+                base_decrypted = run_autokey_decay(k4_unshuffled, priming_key)
+                matrix_decrypted = (base_decrypted - all_shifts) % 26
+                
+                for shift in range(26):
+                    row_text = matrix_decrypted[shift]
+                    for pos in range(len(row_text) - 5):
+                        # Validación para BERLIN
+                        if np.sum(row_text[pos:pos+6] == berlin_vec) >= 4:
+                            text_str = "".join([KRYPTOS_ALPHABET[x] for x in row_text])
+                            payload = {"msg": f"COMBO HIT BERLIN ({np.sum(row_text[pos:pos+6]==berlin_vec)}/6) Priming:{p_str} Shift:{shift} -> {text_str[:40]}..."}
+                            await websocket.send(json.dumps(payload))
+                            await asyncio.sleep(0.05)
+                        
+                        # Validación para CLOCK
+                        if pos < len(row_text) - 4 and np.sum(row_text[pos:pos+5] == clock_vec) >= 4:
+                            text_str = "".join([KRYPTOS_ALPHABET[x] for x in row_text])
+                            payload = {"msg": f"COMBO HIT CLOCK ({np.sum(row_text[pos:pos+5]==clock_vec)}/5) Priming:{p_str} Shift:{shift} -> {text_str[:40]}..."}
+                            await websocket.send(json.dumps(payload))
+                            await asyncio.sleep(0.05)
+            print("[+] Transmisión de hits del pipeline finalizada.")
+        except websockets.exceptions.ConnectionClosed:
+            pass
 
-        # 1. Poda rápida: si no parece inglés, ni lo miramos
-        if fast_chi_squared(pt) > CHI2_MAX:
-            continue
-
-        # 2. CORRECCIÓN 100/10: Ventana fija, no sliding tolerante
-        # Esto evita falsos positivos de BERLIN suelto
-        if check_berlin_clock_window(pt, K4_CRIB, CRIB_START, CRIB_END):
-            hit = {
-                "engine": name,
-                "key": str(key),
-                "plaintext": pt,
-                "crib_pos": f"{CRIB_START}:{CRIB_END}"
-            }
-            logging.info(f"!!! HIT VERIFICADO !!! {hit}")
-            print(f" [!] HIT en {name} | {key} | {pt}")
-            return hit
-
-    logging.info(f"Finalizado sin hits: {name}")
-    return None
-
-def main():
-    print("================================================================")
-    print(" K4 EXHAUSTION MASTER ORCHESTRATOR v2.0 - AUDIT GRADE")
-    print("================================================================")
-    print(f"[*] Criptograma: {K4_CIPHERTEXT[:20]}... (97 chars)")
-    print(f"[*] Regla: plaintext[{CRIB_START}:{CRIB_END}] == {K4_CRIB}")
-    print(f"[*] Chi2 Threshold: {CHI2_MAX}")
-
-    static_engines = [
-        ("VigenereCascade", VigenereCascadeEngine()),
-        ("Beaufort", BeaufortEngine()),
-        ("NonLinearAutokey", NonLinearAutokeyEngine()),
-        ("AsymmetricColumnar", AsymmetricColumnarEngine()),
-        ("BerlinGrille", BerlinGrilleEngine()),
-        ("BerlinClockLFSR", BerlinClockLFSREngine()),
-        ("InversionTemplate", InversionTemplateEngine()),
-        ("HillMatrix2x2", HillMatrixEngine())
-    ]
-
-    task_pool = static_engines.copy()
-    for exp in discover_experimental_engines():
-        task_pool.append((exp.name, exp))
-        print(f"[*] Plugin inyectado: {exp.name}")
-
-    print(f"[*] Cores: {mp.cpu_count()} | Motores: {len(task_pool)}")
-    
-    with mp.Pool(processes=mp.cpu_count()) as pool:
-        results = pool.map(process_engine_space, task_pool)
-
-    valid = [r for r in results if r]
-    print("\n==================== RESULTADOS ====================")
-    if not valid:
-        print("[-] 0/14100+ configuraciones. Exclusión confirmada.")
-        print("[-] Log guardado en exhaustion.log para CI")
-    else:
-        for r in valid:
-            print(f"[+] {r}")
+    async with websockets.serve(handler, "0.0.0.0", 8765):
+        await asyncio.Future()
 
 if __name__ == "__main__":
-    mp.freeze_support()
-    # CORRECCIÓN 100/10: set_start_method solo aquí
     try:
-        mp.set_start_method('spawn', force=True)
-    except RuntimeError:
-        pass
-    main()
+        import websockets
+    except ImportError:
+        os.system("pip install websockets")
+    asyncio.run(quantum_stream_server())
