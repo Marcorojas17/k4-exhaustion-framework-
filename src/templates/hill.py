@@ -1,90 +1,52 @@
-# src/templates/hill.py
-import numpy as np
-from typing import Iterator, Any, List
+from itertools import permutations
 from src.core.base_engine import BaseCryptoEngine
-from src.utils.image_parser import ImageKeyParser
+import math
 
-class HillMatrixEngine(BaseCryptoEngine):
-    """
-    Cifrado Matricial Hill 2x2.
-    Procesa bloques algebraicos mod 26. Extrae matrices candidatas de la topología 
-    de matrix_1.png y matrix_2.png y calcula su matriz inversa modular para el descifrado.
-    """
-    
+class HillMatrix2x2(BaseCryptoEngine):
     @property
-    def name(self) -> str:
-        return "HillMatrix2x2"
+    def name(self): return "HillMatrix3x3-Neon"
 
-    def get_key_generator(self, **kwargs) -> Iterator[Any]:
-        """
-        Genera el espacio de claves matriciales leyendo matrix_1 y matrix_2.
-        Verifica la inversibilidad matemática mod 26 calculando el determinante y el inverso coprimo.
-        """
-        parser = ImageKeyParser()
-        m1 = parser.extract_matrix_mod26("matrix_1.png", size=2)
-        m2 = parser.extract_matrix_mod26("matrix_2.png", size=2)
-        
-        matrices_to_test = []
-        if m1 and len(m1) == 2:
-            matrices_to_test.append(np.array(m1))
-        if m2 and len(m2) == 2:
-            matrices_to_test.append(np.array(m2))
-            
-        # Fallback si no hay imágenes inicializadas en disco
-        if not matrices_to_test:
-            matrices_to_test.append(np.array([[3, 5], [1, 2]]))
+    def get_key_generator(self, **kwargs):
+        digits = list(range(9))
+        # matriz madre 0-8
+        base = [[0,1,2],[3,4,5],[6,7,8]]
+        # prueba todas las permutaciones de 0-8 como 3x3
+        seen=set()
+        for perm in permutations(digits, 9):
+            if perm[:3]==(0,1,2) and perm[3:6]==(3,4,5): # evita repetir base demasiadas
+                pass
+            m = [list(perm[0:3]), list(perm[3:6]), list(perm[6:9])]
+            # det mod26 rápido
+            det = (m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1]) - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0]) + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0])) % 26
+            if det==0 or math.gcd(det,26)!=1: continue
+            key=tuple(perm)
+            if key in seen: continue
+            seen.add(key)
+            yield m
+            if len(seen)>5000: break # cap para no explotar - 5k keys
 
-        for A in matrices_to_test:
-            # Calcular determinante numérico mod 26
-            det = int(np.round(np.linalg.det(A))) % 26
-            
-            # Buscar el inverso multiplicativo modular del determinante (coprimo con 26)
-            inv_det = -1
-            for i in range(1, 26):
-                if (det * i) % 26 == 1:
-                    inv_det = i
-                    break
-                    
-            if inv_det != -1:
-                # Recomponer la matriz adjunta inversa modular 2x2:
-                # [d, -b]
-                # [-c, a]
-                inv_A = np.array([[A[1, 1], -A[0, 1]], [-A[1, 0], A[0, 0]]])
-                inv_A = (inv_det * inv_A) % 26
-                yield inv_A
-            else:
-                # Fallback seguro con matriz invertible canónica de agencia
-                yield np.array([[2, 5], [1, 3]])
+    def decrypt(self,ciphertext,key):
+        alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        # inversa 3x3 mod26
+        m=key
+        det = (m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1]) - m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0]) + m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0])) %26
+        inv_det=pow(det,-1,26)
+        # adjunta
+        adj=[
+            [(m[1][1]*m[2][2]-m[1][2]*m[2][1]), -(m[0][1]*m[2][2]-m[0][2]*m[2][1]), (m[0][1]*m[1][2]-m[0][2]*m[1][1])],
+            [-(m[1][0]*m[2][2]-m[1][2]*m[2][0]), (m[0][0]*m[2][2]-m[0][2]*m[2][0]), -(m[0][0]*m[1][2]-m[0][2]*m[1][0])],
+            [(m[1][0]*m[2][1]-m[1][1]*m[2][0]), -(m[0][0]*m[2][1]-m[0][1]*m[2][0]), (m[0][0]*m[1][1]-m[0][1]*m[1][0])]
+        ]
+        inv=[[ (adj[i][j]*inv_det)%26 for j in range(3)] for i in range(3)]
+        pt=""
+        for i in range(0,len(ciphertext),3):
+            chunk=ciphertext[i:i+3]
+            if len(chunk)<3: chunk+="XX"
+            v=[alpha.index(c) if c in alpha else 0 for c in chunk]
+            p=[(inv[0][0]*v[0]+inv[0][1]*v[1]+inv[0][2]*v[2])%26,
+               (inv[1][0]*v[0]+inv[1][1]*v[1]+inv[1][2]*v[2])%26,
+               (inv[2][0]*v[0]+inv[2][1]*v[1]+inv[2][2]*v[2])%26]
+            pt+="".join(alpha[x] for x in p)
+        return pt[:97]
 
-    def decrypt(self, ciphertext: str, key: Any) -> str:
-        """
-        Descifra agrupando los caracteres A-Z en vectores columna de tamaño 2
-        y multiplicándolos por la matriz inversa modular.
-        """
-        inv_matrix = key
-        
-        # Filtrar solo caracteres A-Z para la operación matricial lineal
-        clean_chars = [c for c in ciphertext if 'A' <= c <= 'Z']
-        if len(clean_chars) % 2 != 0:
-            clean_chars.append('X') # Padding asimétrico estándar de bloques
-            
-        numeric_vector = np.array([ord(c) - 65 for c in clean_chars])
-        decrypted_numeric: List[int] = []
-        
-        # Multiplicación matricial vectorial por bloques de tamaño 2
-        for i in range(0, len(numeric_vector), 2):
-            block = numeric_vector[i:i+2]
-            res = np.dot(inv_matrix, block) % 26
-            decrypted_numeric.extend(res.astype(int).tolist())
-            
-        # Recomponer la cadena manteniendo la integridad de los espacios y caracteres especiales
-        idx = 0
-        plaintext: List[str] = []
-        for char in ciphertext:
-            if 'A' <= char <= 'Z' and idx < len(decrypted_numeric):
-                plaintext.append(chr(decrypted_numeric[idx] + 65))
-                idx += 1
-            else:
-                plaintext.append(char)
-                
-        return "".join(plaintext)
+HillMatrixEngine=HillMatrix2x2
