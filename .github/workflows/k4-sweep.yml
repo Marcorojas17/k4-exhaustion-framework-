@@ -1,0 +1,48 @@
+name: K4 Sweep Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  crypto-audit:
+    name: Sweep Family -> ${{ matrix.family }}
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        family: [substitution, transposition, stream, templates_experimental]
+
+    steps:
+      - name: Descargar Código Fuente
+        uses: actions/checkout@v4
+
+      - name: Inicializar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar Dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generar Topología Visual y Bits del Reloj de Berlín
+        run: python -m src.data.generate_assets
+
+      - name: Ejecutar Orquestador
+        env:
+          ACTIVE_CRYPTO_FAMILY: ${{ matrix.family }}
+        run: python run_exhaustion.py
+
+      - name: Archivar Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exhaustion-log-${{ matrix.family }}
+          path: exhaustion.log
+          retention-days: 7
+          if-no-files-found: warn
