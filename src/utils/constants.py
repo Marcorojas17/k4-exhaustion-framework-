@@ -1,22 +1,29 @@
-# src/utils/constants.py
-
 # ==============================================================================
-# CONSTANTES CRIPTOGRÁFICAS OFICIALES - KRYPTOS
+# CONSTANTES CRIPTOGRÁFICAS Y DE CONFIGURACIÓN DEL PANEL DE INTERFAZ K4
 # ==============================================================================
-
-# Criptograma Maestro K4 Oficial (97 caracteres exactos)
 K4_CIPHERTEXT = "OBKRUOXOGHULBSOLIFBBWFLRVQQPRNGKSSOTWTQSJQSSEKZZWATJKLUDIAWINFBNYPVTTMZFPKWGDKZXTJCDIGKUHUAUEKCAR"
 
-# --- Textos Planos Confirmados de las Secciones Previas ---
-# Útiles para alimentar motores de plantillas moleculares e inversiones fractales
+# Textos Planos Confirmados K1-K3
 K1_PLAINTEXT = "BETWEEN SUBTLE SHADING AND THE ABSENCE OF LIGHT LIES THE NUANCE OF IQLUSION"
-K2_PLAINTEXT = "IT WAS TOTALLY INVISIBLE HOW'S THAT FOR A POSSIBLE CUE? REALLY THEY RE WITH MADISON"
+K2_PLAINTEXT = "IT WAS TOTALLY INVISIBLE HOWS THAT POSSIBLE ?"
 K3_PLAINTEXT = "SLOWLY DESPERATELY SLOWLY THE REMAINS OF PASSAGE DEBRIS THAT ENCUMBERED THE LOWER PART OF THE DOORWAY WAS REMOVED"
 
-# --- Alfabetos Estructurales Base ---
-# Alfabeto latino canónico estándar de 26 caracteres
+# Alfabetos
 ALPHABET_AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-# Alfabeto derivado modificado de la CIA con la palabra clave Kryptos incrustada
-# Se utiliza como el abecedario de indexación dinámico de Sanborn
 KRYPTOS_ALPHABET = "KRYPTOSABCDEFGHIJLMNQUVWXZ"
+
+# Configuración Dinámica Neon Matrix & Berlin Clock
+BERLIN_CLOCK_INITIAL_STATE = "00:00"
+BERLIN_CLOCK_STATUS = "ALL LAMPS OFF - STANDBY"
+
+NEON_MATRIX_NODES = {
+    "MAIN_POOL": ["0.png", "1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png"],
+    "MASTER_NODE": "8.png"
+}
+
+# Helpers para tu orquestador
+HILL_MATRICES = ["0.png", "1.png"]  # Alpha, Beta - Beta activa en CIAN como viste
+TRANSPOSITION_MATRICES = ["2.png", "3.png"]
+BERLIN_BYTES = ["4.png", "5.png", "6.png"]
+LFSR_MASK = "7.png"
+SUBSTITUTION_TABLEAU = "8.png"
