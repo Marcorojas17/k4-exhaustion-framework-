@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>K4 Clock - Neon Matrix</title>
+<style>
+body{background:#000;color:#0f0;font-family:monospace;margin:0;overflow-x:hidden}
+canvas{position:fixed;top:0;left:0;z-index:-1}
+h1{text-align:center;color:#0ff;text-shadow:0 0 20px #0ff, 0 0 40px #f0f;font-size:2.5em;margin:30px}
+.grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;padding:20px}
+.card{border:2px solid #0ff;box-shadow:0 0 20px #0ff, inset 0 0 20px #f0f2;padding:10px;background:rgba(0,0,0,0.8);transition:0.3s}
+.card:hover{transform:scale(1.1);box-shadow:0 0 40px #f0f}
+.card:nth-child(even){border-color:#f0f;box-shadow:0 0 20px #f0f}
+img{width:120px;height:120px;filter:brightness(1.5) drop-shadow(0 0 10px #0ff)}
+p{text-align:center;color:#fff;text-shadow:0 0 5px #0ff;margin:5px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<h1>K4 CLOCK - ASSETS 0-8 // NEON MATRIX</h1>
+<div class="grid">
+<script>
+for(let i=0;i<=8;i++)document.write(`<div class="card"><img src="assets/${i}.png"><p>${i}.png</p></div>`)
+</script>
+</div>
+<script>
+// Matrix rain
+let canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+let cols=Math.floor(canvas.width/20),ypos=Array(cols).fill(0);
+function matrix(){
+ctx.fillStyle='#0001';ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle='#0f0';ctx.font='15pt monospace';
+ypos.forEach((y,ind)=>{
+let text=String.fromCharCode(Math.random()*128);
+ctx.fillText(text,ind*20,y);
+if(y>100+Math.random()*10000)ypos[ind]=0;else ypos[ind]=y+20;
+});
+}
+setInterval(matrix,50);
+</script>
+</body>
+</html>
