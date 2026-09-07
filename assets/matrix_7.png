@@ -1,0 +1,9 @@
+from PIL import Image
+import os
+os.makedirs("assets", exist_ok=True)
+
+bits = [1,1,1,0,1,0,0,0] # offset 16
+m7 = Image.new("1", (8,1))
+m7.putdata(bits)
+m7.save("assets/matrix_7.png")
+print("[+] matrix_7.png")
