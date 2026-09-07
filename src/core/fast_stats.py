@@ -1,14 +1,34 @@
+# src/core/fast_stats.py
 import numpy as np
-from collections import Counter
 
-ENGLISH_FREQ = np.array([0.08167, 0.01492, 0.02782, 0.04253, 0.12702, 0.02228, 0.02015, 0.06094, 0.06966, 0.00153, 0.00772, 0.04025, 0.02406, 0.06749, 0.07507, 0.01929, 0.00095, 0.05987, 0.06327, 0.09056, 0.02758, 0.00978, 0.02360, 0.00150, 0.01974, 0.00074])
+# Perfil estadístico de frecuencias esperadas para el idioma inglés estándar (A-Z)
+ENGLISH_FREQ = np.array([
+    0.0817, 0.0149, 0.0278, 0.0425, 0.1270, 0.0223, 0.0202, 0.0609, 0.0697, 
+    0.0015, 0.0077, 0.0403, 0.0241, 0.0675, 0.0751, 0.0193, 0.0010, 0.0599, 
+    0.0633, 0.0906, 0.0276, 0.0098, 0.0236, 0.0015, 0.0197, 0.0007
+])
 
 def fast_chi_squared(text: str) -> float:
-    text = text.upper()
-    if len(text) != 97: return 999.0
-    counts = Counter(c for c in text if 'A' <= c <= 'Z')
-    observed = np.array([counts.get(chr(65+i), 0) for i in range(26)], dtype=float)
-    expected = ENGLISH_FREQ * len(text)
-    expected = np.where(expected == 0, 1e-6, expected)
-    chi2 = np.sum((observed - expected)**2 / expected)
+    """
+    Calcula la prueba estadística Chi-cuadrado a alta velocidad mediante vectorización.
+    Compara las frecuencias observadas contra la distribución natural del inglés.
+    Valores más bajos indican una estructura lingüística real (legible).
+    """
+    # Convertir el texto plano a un buffer numérico ASCII de alta velocidad
+    encoded = np.frombuffer(text.encode('ascii', errors='ignore'), dtype=np.uint8)
+    
+    # Máscara booleana para retener únicamente letras mayúsculas válidas (A=65, Z=90)
+    mask = (encoded >= 65) & (encoded <= 90)
+    encoded = encoded[mask] - 65
+    
+    n = len(encoded)
+    if n == 0:
+        return float('inf')
+        
+    # Conteo optimizado de frecuencias por cubo (minlength=26 para asegurar el alfabeto)
+    observed = np.bincount(encoded, minlength=26)
+    expected = ENGLISH_FREQ * n
+    
+    # Operación matemática vectorial directa en hardware
+    chi2 = np.sum(((observed - expected) ** 2) / expected)
     return float(chi2)
