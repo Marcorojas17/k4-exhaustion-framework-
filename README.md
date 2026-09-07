@@ -1,3 +1,13 @@
+## Research Impact & Funding
+
+This framework implements the first open-source **exhaustion-based cryptanalytic pipeline** for Kryptos K4, integrating Berlin Clock matrix keys (0-8.png) with statistical validation (Chi-Squared + Index of Coincidence) and crib-based filtering (BERLINCLOCK).
+
+**Academic Value:** Provides reproducible exclusion of 14,100+ cipher families, a methodology applicable to unsolved historical ciphers.
+
+**Support this research:** If you are a researcher, foundation, or enthusiast interested in funding further K4 analysis, please consider sponsoring or contacting: [tu email]
+
+> This work is submitted for academic review and open to collaboration.
+
 # K4 Exhaustion Framework 🧩
 
 Un orquestador de exclusión criptográfica multiproceso para los 97 caracteres finales de Kryptos (K4).
