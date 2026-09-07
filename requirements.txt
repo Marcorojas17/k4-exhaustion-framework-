@@ -1,0 +1,19 @@
+# ==============================================================================
+# K4 EXHAUSTION FRAMEWORK - Dependencias Audit Grade v2.0
+# ==============================================================================
+# Fijadas para reproducibilidad en CI (GitHub Actions)
+
+# Núcleo matemático - Poda Chi2 / IC vectorizado
+numpy==1.26.4
+
+# Extracción de flujos de bits desde assets/ (Berlin Clock PNG)
+pillow==10.4.0
+
+# Análisis estadístico rápido de inglés (sin esto tu fast_stats.py falla en import)
+scipy==1.13.1
+
+# Progreso y auditoría en Pool multiproceso
+tqdm==4.66.4
+
+# Testing de exclusión (para probar que BERLINCLOCK solo pasa en 63:74)
+pytest==8.2.2
