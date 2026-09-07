@@ -1,0 +1,10 @@
+from PIL import Image
+import os
+os.makedirs("assets", exist_ok=True)
+
+# Matrix 5: offset 0 de Berlin Clock 23:51
+bits = [1,1,1,1,0,1,1,1]
+m5 = Image.new("1", (8,1))
+m5.putdata(bits) # 0/1 directo, no 0/255
+m5.save("assets/matrix_5.png")
+print("[+] matrix_5.png - bits:", bits)
