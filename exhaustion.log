@@ -31,3 +31,27 @@ nohup: ignoring input
 2026-09-07 07:32:05 [INFO] Iniciando: VicFractionalCipher
 2026-09-07 07:32:05 [INFO] Finalizado sin hits: VicFractionalCipher
 2026-09-07 07:32:08 [INFO] Finalizado sin hits: VigenereColumnarCombo
+2026-09-07 09:46:43 [INFO] Iniciando: VigenereCascade
+2026-09-07 09:46:43 [INFO] Iniciando: NonLinearAutokey
+2026-09-07 09:46:43 [INFO] Finalizado sin hits: NonLinearAutokey
+2026-09-07 09:46:43 [INFO] Iniciando: AsymmetricColumnar
+2026-09-07 09:46:43 [INFO] Finalizado sin hits: VigenereCascade
+2026-09-07 09:46:43 [INFO] Iniciando: Beaufort
+2026-09-07 09:46:43 [INFO] Finalizado sin hits: Beaufort
+2026-09-07 09:46:43 [INFO] Iniciando: BerlinGrille
+2026-09-07 09:46:43 [INFO] Finalizado sin hits: BerlinGrille
+2026-09-07 09:46:43 [INFO] Iniciando: BerlinClockLFSR
+2026-09-07 09:46:43 [INFO] Finalizado sin hits: AsymmetricColumnar
+2026-09-07 09:46:43 [INFO] Iniciando: InversionTemplate
+2026-09-07 09:46:43 [INFO] Finalizado sin hits: InversionTemplate
+2026-09-07 09:46:43 [INFO] Iniciando: HillMatrix2x2
+2026-09-07 09:46:45 [INFO] Finalizado sin hits: HillMatrix2x2
+2026-09-07 09:46:45 [INFO] Iniciando: HillColumnarCombo
+2026-09-07 09:46:51 [INFO] Finalizado sin hits: HillColumnarCombo
+2026-09-07 09:46:51 [INFO] Iniciando: VigenereColumnarCombo
+2026-09-07 09:47:10 [INFO] Finalizado sin hits: VigenereColumnarCombo
+2026-09-07 09:47:10 [INFO] Iniciando: VicFractionalCipher
+2026-09-07 09:47:10 [INFO] Finalizado sin hits: VicFractionalCipher
+2026-09-07 09:47:10 [INFO] Iniciando: SacredGeometry-LoShu
+2026-09-07 09:47:10 [INFO] Finalizado sin hits: SacredGeometry-LoShu
+2026-09-07 09:47:13 [INFO] Finalizado sin hits: BerlinClockLFSR
