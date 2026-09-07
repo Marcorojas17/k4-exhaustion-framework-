@@ -1,0 +1,39 @@
+# ==============================================================================
+# REGLAS DE EXCLUSIÓN PARA K4 EXHAUSTION FRAMEWORK
+# ==============================================================================
+
+# --- Bitácora y Logs de Fuerza Bruta ---
+exhaustion.log
+*.log
+
+# --- Datos Binarios Pre-calculados ---
+*.bin
+*.msgpack
+*.pickle
+
+# --- Caché Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py.class
+*.egg-info/
+dist/
+build/
+
+# --- Entornos Virtuales ---
+.venv/
+venv/
+env/
+.env
+
+# --- SO ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# --- IDEs ---
+.idea/
+.vscode/
+*.swp
+*.suo
