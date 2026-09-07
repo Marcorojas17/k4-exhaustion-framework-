@@ -1,0 +1,8 @@
+from PIL import Image
+import numpy as np
+import os
+os.makedirs("assets", exist_ok=True)
+
+data = np.array([i % 26 for i in range(100)], dtype=np.uint8).reshape(4,25) * 9
+Image.fromarray(data, 'L').save("assets/matrix_3.png")
+print("[+] matrix_3.png creada - visible")
