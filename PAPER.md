@@ -1,9 +1,17 @@
-# K4 Exhaustion Framework: A Systematic Approach (Preprint)
+# CRYPTANALYSIS REPORT: K4 EXHAUSTION VIA ASYMMETRIC COMBINATORIAL PIPELINE
 
-**Author:** Marco Rojas - marcorojas17.github.io/k4-exhaustion-framework-/
-**Abstract:** First open-source exhaustion pipeline for Kryptos K4 using Berlin Clock matrix keys 0-8.png with chi-squared + IC filtering and crib BERLINCLOCK. Visual neon matrix interface provides reproducibility. Excludes 14,100+ cipher families. Methodology generalizable.
+**Director de Proyecto:** Marco Antonio Rojas Valdovinos  
+**Entidad / Sede:** Proyecto KRONOS Toluca de Lerdo  
+**Fecha:** Septiembre de 2026  
+**Clasificación:** Portafolio Tecnológico Propietario / Derechos Reservados  
 
-**Keywords:** Kryptos, K4, Berlin Clock, cryptanalysis, exhaustion, chi-squared
+## 1. Abstract
+This paper details the discovery of structured linguistic anomalies in Kryptos K4 ciphertext using a combined execution pipeline: a 4x25 Columnar Un-shuffle integrated with a Non-Linear Autokey Decay Engine. 
 
-**Funding:** Open to grants/sponsorship. Contact via GitHub.
-**DOI:** To be assigned via Zenodo.
+## 2. Mathematical Anomalies Detected
+Using vector-broadcasting mod 26 via NumPy, the framework isolated two distinct high-probability partial hits matching confirmed crib definitions:
+* **Hit 1 (Position 49, Shift 2):** Aligned `BEROPN` (4/6 letters matching "BERLIN") using priming key `CLOC`.
+* **Hit 2 (Position 48, Shift 12):** Aligned `BXILIN` (4/6 letters matching "BERLIN") using historical CIA cue `PALI` (Palimpsest).
+
+## 3. Intellectual Property Restrictions
+The core optimization logic, telemetry subsystems, and parallel WebSockets deployed in this repository are protected under the Proprietary & Commercial Protection License. Automated scraping, data mining, or utilization for AI LLM training (e.g., Copilot, ChatGPT) is strictly prohibited.
