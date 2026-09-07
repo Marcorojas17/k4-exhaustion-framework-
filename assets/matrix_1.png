@@ -1,0 +1,14 @@
+from PIL import Image
+import numpy as np
+import os
+
+os.makedirs("assets", exist_ok=True)
+
+# Fix: Multiplica x 40 para que sea visible (3*40=120 gris medio)
+data = np.array([[3, 5], [1, 2]], dtype=np.uint8) * 40
+
+img = Image.fromarray(data, mode='L')
+img.save("assets/matrix_1.png")
+
+print("[+] matrix_1.png creada - Valores visibles [120, 200, 40, 80]")
+print(f"Data real guardada: {data.tolist()}")
