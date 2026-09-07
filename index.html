@@ -1,42 +1,86 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>K4 Clock - Neon Matrix</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K4 Clock - Neon Matrix 0-8</title>
 <style>
-body{background:#000;color:#0f0;font-family:monospace;margin:0;overflow-x:hidden}
-canvas{position:fixed;top:0;left:0;z-index:-1}
-h1{text-align:center;color:#0ff;text-shadow:0 0 20px #0ff, 0 0 40px #f0f;font-size:2.5em;margin:30px}
-.grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;padding:20px}
-.card{border:2px solid #0ff;box-shadow:0 0 20px #0ff, inset 0 0 20px #f0f2;padding:10px;background:rgba(0,0,0,0.8);transition:0.3s}
+body{
+  margin:0;
+  background:#000 url('assets/matrix-bg.webp') repeat;
+  background-size:cover;
+  background-attachment:fixed;
+  color:#0f0;
+  font-family:monospace;
+  overflow-x:hidden;
+}
+canvas#matrix{position:fixed;top:0;left:0;z-index:-1;opacity:0.6}
+h1{
+  text-align:center;
+  color:#0ff;
+  text-shadow:0 0 20px #0ff, 0 0 40px #f0f;
+  font-size:2.5em;
+  margin:30px;
+  position:relative;
+  z-index:1;
+}
+.grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:25px;
+  padding:20px;
+  position:relative;
+  z-index:1;
+}
+.card{
+  border:2px solid #0ff;
+  box-shadow:0 0 20px #0ff, inset 0 0 20px rgba(255,0,255,0.2);
+  padding:12px;
+  background:rgba(0,0,0,0.85);
+  transition:0.3s;
+  text-align:center;
+}
 .card:hover{transform:scale(1.1);box-shadow:0 0 40px #f0f}
-.card:nth-child(even){border-color:#f0f;box-shadow:0 0 20px #f0f}
-img{width:120px;height:120px;filter:brightness(1.5) drop-shadow(0 0 10px #0ff)}
-p{text-align:center;color:#fff;text-shadow:0 0 5px #0ff;margin:5px}
+.card:nth-child(odd){border-color:#f0f; box-shadow:0 0 20px #f0f, inset 0 0 20px rgba(0,255,255,0.2)}
+.card img{width:120px;height:120px;filter:brightness(1.5) drop-shadow(0 0 10px #0ff)}
+.card:nth-child(odd) img{filter:brightness(1.5) drop-shadow(0 0 10px #f0f)}
+.card p{color:#fff;text-shadow:0 0 5px #0ff;margin:8px 0 0;font-weight:bold}
+.card.magenta{border-color:#ff00ff; box-shadow:0 0 20px #ff00ff}
+.card.cyan{border-color:#00ffff; box-shadow:0 0 20px #00ffff}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+<canvas id="matrix"></canvas>
 <h1>K4 CLOCK - ASSETS 0-8 // NEON MATRIX</h1>
-<div class="grid">
+<div class="grid" id="grid"></div>
+
 <script>
-for(let i=0;i<=8;i++)document.write(`<div class="card"><img src="assets/${i}.png"><p>${i}.png</p></div>`)
-</script>
-</div>
-<script>
-// Matrix rain
-let canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-let cols=Math.floor(canvas.width/20),ypos=Array(cols).fill(0);
-function matrix(){
-ctx.fillStyle='#0001';ctx.fillRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle='#0f0';ctx.font='15pt monospace';
-ypos.forEach((y,ind)=>{
-let text=String.fromCharCode(Math.random()*128);
-ctx.fillText(text,ind*20,y);
-if(y>100+Math.random()*10000)ypos[ind]=0;else ypos[ind]=y+20;
-});
+// Genera 0-8 con colores auditados magenta/cian
+const grid=document.getElementById('grid');
+for(let i=0;i<=8;i++){
+  let color = i%2===0? 'magenta' : 'cyan';
+  let labelColor = i%2===0? '#f0f' : '#0ff';
+  grid.innerHTML+=`<div class="card ${color}"><img src="assets/${i}.png" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22black%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22${labelColor}%22 text-anchor=%22middle%22 dy=%22.3em%22>${i}.png</text></svg>'"><p style="color:${labelColor}">${i}.png // ${color.toUpperCase()}</p></div>`;
 }
-setInterval(matrix,50);
+
+// Matrix rain magenta/cian
+const canvas=document.getElementById('matrix'),ctx=canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resize(); window.addEventListener('resize',resize);
+let cols=Math.floor(canvas.width/18), ypos=Array(cols).fill(0);
+function matrix(){
+  ctx.fillStyle='rgba(0,0,0,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ypos.forEach((y,ind)=>{
+    let isMagenta = ind%2===0;
+    ctx.fillStyle = isMagenta? '#ff00ff' : '#00ffff';
+    ctx.font='14pt monospace';
+    ctx.fillText(Math.random()>0.5?'1':'0',ind*18,y);
+    if(y>canvas.height+Math.random()*10000) ypos[ind]=0; else ypos[ind]=y+18;
+  });
+}
+setInterval(matrix,45);
 </script>
 </body>
 </html>
