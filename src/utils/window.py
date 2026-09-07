@@ -29,3 +29,8 @@ def evaluate_crib_window(plaintext: str, cribs: List[str]) -> Tuple[int, str, in
         return best_score, found_crib, found_pos
 
     return 0, "NONE", -1
+
+def check_berlin_clock_window(plaintext: str, cribs=None):
+    if cribs is None:
+        cribs = ["BERLIN", "CLOCK", "PALIMPSEST", "EAST", "NORTHEAST"]
+    return evaluate_crib_window(plaintext, cribs)
